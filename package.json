@@ -1,0 +1,59 @@
+{
+    "license": "MPL 2.0", 
+    "name": "lingodisco-inline-translate",
+    "fullName": "LingoDisco Inline Translate",
+    "homepage": "http://cooley.ie/lingodisco-inline-translate",
+    "author": "James Cooley",
+    "keywords": ["inline", "translate", "clipboard"],
+    "description": "Add an inline translation to a selected piece of text. It works with Google and Bing translate but can work with any web translation service by changing the user preferences.",
+    "id": "lingodisco-inline-translate",
+    "version":"0.3",
+    "preferences": [
+    	{
+    	"type": "control",
+    	"label": "Google!",
+    	"name": "reset_google",
+    	"title": "Reset to Google"
+	},
+    	{
+    	"type": "control",
+    	"label": "Bing!",
+    	"name": "reset_bing",
+    	"title": "Reset to Bing"
+	},
+	{
+    	    "description": "The translation service url",
+            "name": "translation_url",
+            "type": "string",
+	    "value": "http://translate.google.com/",
+            "title": "Translation service url?"
+	    },
+    	    {
+	    "description": "The name of the translation input box for the web translation service",
+            "name": "translation_input",
+            "type": "string",
+            "value": "#source", 
+            "title": "Input?"
+	    },
+	    {
+    	    "description": "The name of the translation output box for the web translation service",
+            "name": "translation_output",
+            "type": "string",
+            "value": "#result_box", 
+            "title": "Output?"
+	    },
+	    {
+    	    "description": "This extension is designed for short translations. This setting is used to try to limit bad clipboard selections e.g. when the entire page is selected by mistake.",
+            "name": "translation_cutoff",
+            "type": "integer",
+            "value": 300, 
+            "title": "Selection check limit?"
+	    },
+	    {
+	    "description": "The number of items from the translation history to display in the panel",
+            "name": "translation_history_count",
+            "type": "integer",
+            "value": 5, 
+            "title": "Translation history count?"
+	}]
+}
