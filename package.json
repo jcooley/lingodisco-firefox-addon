@@ -4,10 +4,10 @@
     "fullName": "LingoDisco Inline Translate",
     "homepage": "http://cooley.ie/lingodisco-inline-translate",
     "author": "James Cooley",
-    "keywords": ["inline", "translate", "clipboard"],
+    "keywords": ["inline", "translate", "instant", "translation", "clipboard", "bing", "google", "copy" ],
     "description": "Add an inline translation to a selected piece of text. It works with Google and Bing translate but can work with any web translation service by changing the user preferences.",
     "id": "lingodisco-inline-translate",
-    "version":"0.4",
+    "version":"0.5",
     "preferences": [
     	{
     	"type": "control",

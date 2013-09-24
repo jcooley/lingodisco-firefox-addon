@@ -6,47 +6,92 @@ var TRANSLATION_INPUT, TRANSLATION_OUTPUT;
 var UPDATE_CALLBACK_ATTACHED = false;
 
 self.port.on('setprefs', function(inbox, outbox){
+    console.log('setprefs ' + inbox + ' ' + outbox);
     TRANSLATION_INPUT = inbox;
     TRANSLATION_OUTPUT = outbox;
-    if( $(TRANSLATION_OUTPUT).length > 0){
-	// show the translation when the output text is update
-	addMutationObserver(TRANSLATION_OUTPUT, showtrans)
-	UPDATE_CALLBACK_ATTACHED = true;
-    }else{
-	UPDATE_CALLBACK_ATTACHED = false;
-    }
+    on_update_register();
 })
 
-var observer = null;
 
-// JQuery on() didn't work but here's a work-around.
-// see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+// Sometimes the page isn't loaded or the an incorrect element was specified.
+// This is a simple check using JQuery
+function element_found(element){
+    return $(element).length > 0
+}
 
 // configuration of the observer:
 var config = { attributes: true, childList: false, characterData: false};
+var observer;
 
-function addMutationObserver(element, fun){
-    if (observer != null){
-	console.log("observer was already added for " + element);
+/* 
+   JQuery on() didn't work but here's a work-around. MutationObserver is a DOM 4 
+   construct to replace the deprecated bind events.
+   see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+
+   It seems to work pretty well but it could have an impact on performance if
+   the observer is not disconnected.
+ */
+function on_update_register(){
+    if(element_found(TRANSLATION_OUTPUT)){
+	// could we have an observer from another translation page - probably not.
+	if (observer != null ){ //&& (observer.target == undefined)){
+	    console.log("observer was already added.");
+	    return;
+	}
+	// create an observer instance
+	console.log("preparing observer for " + TRANSLATION_OUTPUT);
+	observer = new MutationObserver(function(mutations) {
+	    showtrans();
+	});
+	// show the translation when the output text is updated
+	console.log("on_update_register UPDATE_CALLBACK_ATTACHED for "+ TRANSLATION_OUTPUT ); 
+    }else{
+	console.log("on_update_register UPDATE_CALLBACK_ATTACHED == NO for " + TRANSLATION_OUTPUT ); 
+    }
+    return observer;
+}
+
+function on_update_start(){
+    if(observer == undefined){
+	console.log("on_update_start observer is undefined");
+	if(TRANSLATION_OUTPUT == undefined){
+	    console.log("scraper - TRANSLATION_OUTPUT undefined. Try resetting scraper from main.js");
+	    self.port.emit("reset_scraper");
+	    return;
+	}else{
+	    on_update_register();
+	}
+    }
+    if(element_found(TRANSLATION_OUTPUT)){
+	if(observer.target != TRANSLATION_OUTPUT){
+	    // stop observing a previous translator
+	    if(observer.target != undefined){
+		console.log("on_update_start stop observing " + observer.target);
+		on_update_stop();
+	    }
+	    var target = document.querySelector(TRANSLATION_OUTPUT);
+	    // pass in the target node, as well as the observer options
+	    observer.observe(target, config);
+	    console.log("on_update_start translator loaded!");
+	}else{
+	    console.log("on_update_start translator observer already registered!");
+	}
+    }else{
+	console.log("on_update_start translator not loaded!");
+    }
+}
+
+function on_update_stop(){
+    // should cover undefine too?
+    if(observer == null){
+	console.log("on_update_stop observer is null");
 	return;
     }
-    // create an observer instance
-    observer = new MutationObserver(function(mutations) {
-	fun();
-    });
-    connectMO(element);
-}
-
-function connectMO(element){
-    var target = document.querySelector(element);
-    // pass in the target node, as well as the observer options
-    observer.observe(target, config);
-}
-
-function disconnectMO(){
     // empties the instance's record queue and returns what was in there.
     var records = observer.takeRecords();
     observer.disconnect();
+    console.log("on_update_stop observer done.");
+    
 }
 
 /**
@@ -57,9 +102,9 @@ function disconnectMO(){
 // update the source of the translation in google translate panel
 // and the translation appears automatically in the result_box.
 self.port.on('translate', function(source_text){
-    if( $(TRANSLATION_INPUT).length > 0){
+    if( element_found(TRANSLATION_INPUT)){
 	if(!UPDATE_CALLBACK_ATTACHED){
-	    addMutationObserver(TRANSLATION_OUTPUT, showtrans)
+	    on_update_start();
 	    UPDATE_CALLBACK_ATTACHED = true;
 	}
 	$(TRANSLATION_INPUT).val(source_text);
@@ -67,10 +112,11 @@ self.port.on('translate', function(source_text){
 	// sometimes the external translation page does not load on time. 
 	// Simply reloading the translator works around the timing issues .
 	UPDATE_CALLBACK_ATTACHED = false;
-	self.port.emit('translatorReload', source_text);
+	self.port.emit('translator_reload', source_text);
     }
 });
 
+/*  send the translation back to the add-on scope for display */
 function showtrans(){
     var orig = $(TRANSLATION_INPUT).val();
     var trans =  $(TRANSLATION_OUTPUT).map(function() { 
@@ -79,8 +125,19 @@ function showtrans(){
     self.port.emit('update_selection', orig, trans);
 }
 
-// Grab the translation 
+/* Grab the translation from the output element */
 self.port.on('showtrans', function(){
     showtrans();
 });
 
+self.port.on('stop_translation_updates', function(){
+    on_update_stop();
+});
+
+self.port.on('start_translation_updates', function(){
+    on_update_start();
+});
+
+
+$("document").ready(function () {
+});

@@ -1,4 +1,4 @@
-var ENABLE = "Enable", DISABLE = "Disable", ON = "on", OFF = "off";
+var ENABLE = "Enable", DISABLE = "Disable", ON = "on", OFF = "off", isSwitchedOff = false;
 
 self.port.on('translated', function(source_text){
     $('#translated').html( source_text);
@@ -14,6 +14,15 @@ self.port.on('localize_enable_disable', function(enable, disable, on, off){
     $("#onoff").html(OFF);    
 });
 
+// Odd things can happen if you switch tranlation engines so this just resets things.
+self.port.on('switch_off', function(){
+    update_visible_state(false);
+});
+
+self.port.on('switch_on', function(){
+    update_visible_state(true);
+});
+
 $(window).click(function (event) {
     var t = event.target;
     
@@ -27,18 +36,24 @@ $(window).click(function (event) {
     self.port.emit('click', t.name);
 
     if(t.name == 'toggle'){
-	var onOff = document.getElementById('onoff').textContent == OFF; 
-	$("#onoff").html(onOff?ON:OFF);    
-	$("#toggle").html(onOff?DISABLE:ENABLE);    
-	if(onOff){
-	    $("#display_translation_id").show();    
-
-	}else{
-	    $("#display_translation_id").hide();    
-	}
-	self.port.emit('show_translation_history');
+	isSwitchedOff = !isSwitchedOff;
+	update_visible_state(isSwitchedOff);
     }
 });
+
+
+function update_visible_state(isOff){
+    console.log("toggle state " + isOff);
+    $("#onoff").html(isOff?ON:OFF);    
+    $("#toggle").html(isOff?DISABLE:ENABLE);    
+    if(isOff){
+	$("#display_translation_id").show();
+
+    }else{
+	$("#display_translation_id").hide();    
+    }
+    self.port.emit('show_translation_history');
+}
 
 // Panels have an OS-specific background color by default, and the Mac OS X
 // background color is dark grey, but Reddit expects its background to be white
