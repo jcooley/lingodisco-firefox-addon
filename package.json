@@ -7,7 +7,7 @@
     "keywords": ["inline", "translate", "clipboard"],
     "description": "Add an inline translation to a selected piece of text. It works with Google and Bing translate but can work with any web translation service by changing the user preferences.",
     "id": "lingodisco-inline-translate",
-    "version":"0.3",
+    "version":"0.4",
     "preferences": [
     	{
     	"type": "control",

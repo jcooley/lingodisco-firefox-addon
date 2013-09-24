@@ -4,7 +4,6 @@ self.port.on('translated', function(source_text){
     $('#translated').html( source_text);
     $("#translated td").css({"vertical-align": "top", "border": "solid thin"});    
     $("#buttons td").css({"border-bottom": "dotted thin", "padding-bottom": "4px"});    
-    //$("td").css( "background-color", "yellow" )
 });
 
 self.port.on('localize_enable_disable', function(enable, disable, on, off){
@@ -33,6 +32,7 @@ $(window).click(function (event) {
 	$("#toggle").html(onOff?DISABLE:ENABLE);    
 	if(onOff){
 	    $("#display_translation_id").show();    
+
 	}else{
 	    $("#display_translation_id").hide();    
 	}

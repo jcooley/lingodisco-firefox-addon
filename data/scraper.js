@@ -17,20 +17,36 @@ self.port.on('setprefs', function(inbox, outbox){
     }
 })
 
+var observer = null;
+
 // JQuery on() didn't work but here's a work-around.
 // see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+
+// configuration of the observer:
+var config = { attributes: true, childList: false, characterData: false};
+
 function addMutationObserver(element, fun){
-    var target = document.querySelector(element);
+    if (observer != null){
+	console.log("observer was already added for " + element);
+	return;
+    }
     // create an observer instance
-    var observer = new MutationObserver(function(mutations) {
-	mutations.forEach(function(mutation) {
-	    fun();
-	});    
+    observer = new MutationObserver(function(mutations) {
+	fun();
     });
-    // configuration of the observer:
-    var config = { attributes: true, childList: true, characterData: true };
+    connectMO(element);
+}
+
+function connectMO(element){
+    var target = document.querySelector(element);
     // pass in the target node, as well as the observer options
     observer.observe(target, config);
+}
+
+function disconnectMO(){
+    // empties the instance's record queue and returns what was in there.
+    var records = observer.takeRecords();
+    observer.disconnect();
 }
 
 /**
@@ -67,3 +83,4 @@ function showtrans(){
 self.port.on('showtrans', function(){
     showtrans();
 });
+
