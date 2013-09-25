@@ -43,7 +43,6 @@ $(window).click(function (event) {
 
 
 function update_visible_state(isOff){
-    console.log("toggle state " + isOff);
     $("#onoff").html(isOff?ON:OFF);    
     $("#toggle").html(isOff?DISABLE:ENABLE);    
     if(isOff){

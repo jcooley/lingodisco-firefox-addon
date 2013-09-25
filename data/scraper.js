@@ -6,7 +6,6 @@ var TRANSLATION_INPUT, TRANSLATION_OUTPUT;
 var UPDATE_CALLBACK_ATTACHED = false;
 
 self.port.on('setprefs', function(inbox, outbox){
-    console.log('setprefs ' + inbox + ' ' + outbox);
     TRANSLATION_INPUT = inbox;
     TRANSLATION_OUTPUT = outbox;
     on_update_register();
@@ -34,28 +33,24 @@ var observer;
 function on_update_register(){
     if(element_found(TRANSLATION_OUTPUT)){
 	// could we have an observer from another translation page - probably not.
-	if (observer != null ){ //&& (observer.target == undefined)){
+	if (observer != null ){ 
 	    console.log("observer was already added.");
 	    return;
 	}
 	// create an observer instance
-	console.log("preparing observer for " + TRANSLATION_OUTPUT);
 	observer = new MutationObserver(function(mutations) {
 	    showtrans();
 	});
 	// show the translation when the output text is updated
-	console.log("on_update_register UPDATE_CALLBACK_ATTACHED for "+ TRANSLATION_OUTPUT ); 
     }else{
-	console.log("on_update_register UPDATE_CALLBACK_ATTACHED == NO for " + TRANSLATION_OUTPUT ); 
+	console.log("on_update_register failed UPDATE_CALLBACK_ATTACHED as element not available - " + TRANSLATION_OUTPUT ); 
     }
     return observer;
 }
 
 function on_update_start(){
-    if(observer == undefined){
-	console.log("on_update_start observer is undefined");
-	if(TRANSLATION_OUTPUT == undefined){
-	    console.log("scraper - TRANSLATION_OUTPUT undefined. Try resetting scraper from main.js");
+    if(!observer){
+	if(!TRANSLATION_OUTPUT){
 	    self.port.emit("reset_scraper");
 	    return;
 	}else{
@@ -65,14 +60,12 @@ function on_update_start(){
     if(element_found(TRANSLATION_OUTPUT)){
 	if(observer.target != TRANSLATION_OUTPUT){
 	    // stop observing a previous translator
-	    if(observer.target != undefined){
-		console.log("on_update_start stop observing " + observer.target);
+	    if(observer){
 		on_update_stop();
 	    }
 	    var target = document.querySelector(TRANSLATION_OUTPUT);
 	    // pass in the target node, as well as the observer options
 	    observer.observe(target, config);
-	    console.log("on_update_start translator loaded!");
 	}else{
 	    console.log("on_update_start translator observer already registered!");
 	}
@@ -83,15 +76,13 @@ function on_update_start(){
 
 function on_update_stop(){
     // should cover undefine too?
-    if(observer == null){
+    if(!observer){
 	console.log("on_update_stop observer is null");
 	return;
     }
     // empties the instance's record queue and returns what was in there.
     var records = observer.takeRecords();
-    observer.disconnect();
-    console.log("on_update_stop observer done.");
-    
+    observer.disconnect();    
 }
 
 /**
