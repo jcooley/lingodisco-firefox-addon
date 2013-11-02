@@ -15,11 +15,11 @@ self.port.on('setprefs', function(inbox, outbox){
 // Sometimes the page isn't loaded or the an incorrect element was specified.
 // This is a simple check using JQuery
 function element_found(element){
-    return $(element).length > 0
+    return $(element).length > 0;
 }
 
 // configuration of the observer:
-var config = { attributes: true, childList: false, characterData: false};
+var config = { attributes: true, childList: false, characterData: false, attributeOldValue: false};
 var observer;
 
 /* 
@@ -33,7 +33,7 @@ var observer;
 function on_update_register(){
     if(element_found(TRANSLATION_OUTPUT)){
 	// could we have an observer from another translation page - probably not.
-	if (observer != null ){ 
+	if (observer){ 
 	    console.log("observer was already added.");
 	    return;
 	}
@@ -77,7 +77,7 @@ function on_update_start(){
 function on_update_stop(){
     // should cover undefine too?
     if(!observer){
-	console.log("on_update_stop observer is null");
+	console.log("on_update_stop observer is null, nothing to do.");
 	return;
     }
     // empties the instance's record queue and returns what was in there.
