@@ -7,7 +7,7 @@
     "keywords": ["inline", "translate", "instant", "translation", "clipboard", "bing", "google", "copy" ],
     "description": "Add an inline translation to a selected piece of text. It works with Google and Bing translate but can work with any web translation service by changing the user preferences.",
     "id": "lingodisco-inline-translate@jetpack",
-    "version":"1.0.1",
+    "version":"1.0.2",
     "main":"lib/main.js",
     "preferences": [
     	{
